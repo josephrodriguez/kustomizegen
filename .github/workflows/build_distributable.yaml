@@ -1,0 +1,57 @@
+name: Build and Release Kustomizegen
+
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      AUTH_TOKEN: ${{ secrets.FINE_GRAINED_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.18
+
+      - name: Run unit tests
+        run: go test -v ./test
+
+      - name: Build for Ubuntu
+        run: GOOS=linux GOARCH=amd64 go build -o kustomizegen
+
+      - name: Compress binary
+        if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
+        run: tar czf kustomizegen_linux_amd64.tar.gz kustomizegen
+
+      - name: Create release
+        if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
+        id: create_release
+        run: |
+          RELEASE_TAG=$(echo "${GITHUB_REF#refs/tags/}")
+          BODY="{\"tag_name\":\"${RELEASE_TAG}\",\"name\":\"Release ${RELEASE_TAG}\",\"body\":\"Release ${RELEASE_TAG}\",\"draft\":false,\"prerelease\":false}"
+          RESPONSE=$(curl --request POST --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" \
+            --header "Authorization: Bearer ${AUTH_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data "$BODY")
+          RELEASE_ID=$(echo "${RESPONSE}" | jq -r '.id')
+          echo "::set-output name=release_id::$RELEASE_ID"
+
+      - name: Upload binary as asset
+        if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
+        run: |
+          RELEASE_TAG=$(echo "${GITHUB_REF#refs/tags/}")
+          RELEASE_ID="${{ steps.create_release.outputs.release_id }}"
+          curl --request POST --url "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=kustomizegen_${RELEASE_TAG}_linux_amd64.tar.gz" \
+            --header "Authorization: Bearer ${AUTH_TOKEN}" \
+            --header "Content-Type: application/gzip" \
+            --data-binary "@./kustomizegen_linux_amd64.tar.gz"
