@@ -1,4 +1,4 @@
-package kustomizegen
+package main
 
 import (
 	"flag"
