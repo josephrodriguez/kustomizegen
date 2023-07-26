@@ -144,6 +144,21 @@ type FileSource struct {
 	Source string `yaml:"source,omitempty"`
 }
 
+type NamespaceTransformer struct {
+	APIVersion             string      `yaml:"apiVersion"`
+	Kind                   string      `yaml:"kind"`
+	Metadata               Metadata    `yaml:"metadata"`
+	SetRoleBindingSubjects string      `yaml:"setRoleBindingSubjects,omitempty"`
+	UnsetOnly              bool        `yaml:"unsetOnly,omitempty"`
+	FieldSpecs             []FieldSpec `yaml:"fieldSpecs,omitempty"`
+}
+
+type FieldSpec struct {
+	Path   string `yaml:"path,omitempty"`
+	Kind   string `yaml:"kind,omitempty"`
+	Create bool   `yaml:"create,omitempty"`
+}
+
 func NewKustomization(resources []string) *Kustomization {
 	return &Kustomization{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
@@ -151,4 +166,30 @@ func NewKustomization(resources []string) *Kustomization {
 		Resources:  resources,
 		// Initialize other fields here as needed
 	}
+}
+
+func NewNamespaceTransformer(namespace string, unsetOnly ...bool) NamespaceTransformer {
+	ns := NamespaceTransformer{
+		APIVersion: "builtin",
+		Kind:       "NamespaceTransformer",
+		Metadata: Metadata{
+			Name:      "namespace-transformer",
+			Namespace: namespace,
+		},
+		FieldSpecs: []FieldSpec{
+			{
+				Path:   "metadata/name",
+				Kind:   "Namespace",
+				Create: true,
+			},
+		},
+	}
+
+	if len(unsetOnly) > 0 {
+		ns.UnsetOnly = unsetOnly[0]
+	} else {
+		ns.UnsetOnly = false
+	}
+
+	return ns
 }
