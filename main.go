@@ -15,14 +15,17 @@ func main() {
 		Short: "Create the kustomization files",
 		Run:   cmd.Configure,
 	}
-	configureCmd.Flags().StringP("namespace", "n", "", "Namespace value")
-	configureCmd.Flags().BoolP("unsetOnly", "u", false, "UnsetOnly value")
+	configureCmd.Flags().StringP("root", "r", "", "Path to the Kustomization base folder")
+	configureCmd.Flags().StringP("configuration", "c", "", "Configure file path")
+
+	configureCmd.MarkFlagRequired("root")
+	configureCmd.MarkFlagRequired("configuration")
 
 	var versionCmd = &cobra.Command{
 		Use:   "version",
 		Short: "Display the compiled version",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Println("KustomizeGen Version", version)
+			cmd.Println("KustomizeGen Version:", version)
 		},
 	}
 

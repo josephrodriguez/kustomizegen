@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/josephrodriguez/kustomizegen/serialization"
+	"github.com/josephrodriguez/kustomizegen/types"
 	"gopkg.in/yaml.v2"
-	"josephrodriguez.github.com/kustomizegen/src/serialization"
-	"josephrodriguez.github.com/kustomizegen/src/types"
 )
 
 func TestMarshalToYAML(t *testing.T) {
@@ -22,7 +22,7 @@ func TestMarshalToYAML(t *testing.T) {
 	}()
 
 	// Call the function being tested
-	err := serialization.MarshalToYAML(data, filename)
+	err := serialization.MarshalToYAMLFile(data, filename)
 	if err != nil {
 		t.Errorf("Error while marshaling to YAML: %v", err)
 		return

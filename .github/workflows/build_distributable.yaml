@@ -3,7 +3,7 @@ name: Build and Release Kustomizegen
 on:
   push:
     branches:
-      - 'main'
+      - '*'
     tags:
       - 'v*'
 
@@ -27,7 +27,7 @@ jobs:
         run: go test -v ./test
 
       - name: Build for Ubuntu
-        run: GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -gcflags="all=-trimpath=${PWD}" -ldflags="-X main.version=$(git describe --tags --always)" -o kustomizegen
+        run: GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X main.version=$(git describe --tags --always)" -gcflags="all=-trimpath=${PWD}" -o kustomizegen
 
       - name: Compress binary
         if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}

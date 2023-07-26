@@ -3,8 +3,8 @@ package configuration
 import (
 	"io/ioutil"
 
+	"github.com/josephrodriguez/kustomizegen/types"
 	"gopkg.in/yaml.v2"
-	"josephrodriguez.github.com/kustomizegen/src/types"
 )
 
 func ReadConfigFromFile(filePath string) (*types.KustomizationConfig, error) {

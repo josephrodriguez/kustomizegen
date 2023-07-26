@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"josephrodriguez.github.com/kustomizegen/src/types"
+	"github.com/josephrodriguez/kustomizegen/types"
 )
 
 func TestNewKustomizationWithEmptyResources(t *testing.T) {
