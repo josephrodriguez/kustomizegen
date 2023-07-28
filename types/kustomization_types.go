@@ -1,14 +1,5 @@
 package types
 
-type KustomizationConfig struct {
-	Version    string                   `yaml:"version"`
-	Namespaces []KustomizationNamespace `yaml:"namespaces"`
-}
-
-type KustomizationNamespace struct {
-	Name string `yaml:"name"`
-}
-
 type Kustomization struct {
 	APIVersion            string                 `yaml:"apiVersion"`
 	Kind                  string                 `yaml:"kind"`
@@ -130,6 +121,7 @@ type LabelSelector struct {
 
 type HelmChart struct {
 	Name        string            `yaml:"name,omitempty"`
+	ReleaseName string            `yaml:"releaseName,omitempty"`
 	Version     string            `yaml:"version,omitempty"`
 	Chart       string            `yaml:"chart,omitempty"`
 	Repository  string            `yaml:"repository,omitempty"`
@@ -159,13 +151,13 @@ type FieldSpec struct {
 	Create bool   `yaml:"create,omitempty"`
 }
 
-func NewKustomization(resources []string) *Kustomization {
-	return &Kustomization{
+func PrototypeKustomization() *Kustomization {
+	kustomization := &Kustomization{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
 		Kind:       "Kustomization",
-		Resources:  resources,
-		// Initialize other fields here as needed
 	}
+
+	return kustomization
 }
 
 func NewNamespaceTransformer(namespace string, unsetOnly ...bool) NamespaceTransformer {

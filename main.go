@@ -5,21 +5,35 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version string // version will be set during the build using ldflags
+var version string
 
 func main() {
 	var rootCmd = &cobra.Command{Use: "kustomizegen"}
 
 	var configureCmd = &cobra.Command{
-		Use:   "configure",
-		Short: "Create the kustomization files",
-		Run:   cmd.Configure,
+		Use:   "generate-overlays",
+		Short: "Create the Kustomization overlays",
+		Run:   cmd.GenerateOverlaysCommand,
 	}
 	configureCmd.Flags().StringP("root", "r", "", "Path to the Kustomization base folder")
-	configureCmd.Flags().StringP("configuration", "c", "", "Configure file path")
-
 	configureCmd.MarkFlagRequired("root")
-	configureCmd.MarkFlagRequired("configuration")
+
+	var generateBuildCmd = &cobra.Command{
+		Use:   "print-build-command",
+		Short: "Generate the shell script with build commands for configured overlays",
+		Run:   cmd.GenerateBuildCommand,
+	}
+	generateBuildCmd.Flags().StringP("root", "r", "", "Path to the Kustomization base folder")
+	generateBuildCmd.MarkFlagRequired("root")
+	generateBuildCmd.Flags().Bool("enable-helm", false, "Enable Helm")
+
+	var destroyCmd = &cobra.Command{
+		Use:   "destroy-overlays",
+		Short: "Destroy the generated Kustomization overlays",
+		Run:   cmd.DestroyOverlaysCommand,
+	}
+	destroyCmd.Flags().StringP("root", "r", "", "Path to the Kustomization base folder")
+	destroyCmd.MarkFlagRequired("root")
 
 	var versionCmd = &cobra.Command{
 		Use:   "version",
@@ -29,6 +43,6 @@ func main() {
 		},
 	}
 
-	rootCmd.AddCommand(configureCmd, versionCmd)
+	rootCmd.AddCommand(configureCmd, generateBuildCmd, destroyCmd, versionCmd)
 	rootCmd.Execute()
 }

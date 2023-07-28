@@ -9,6 +9,10 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        goarch: [amd64, arm64]
+  
     runs-on: ubuntu-latest
 
     env:
@@ -26,12 +30,12 @@ jobs:
       - name: Run unit tests
         run: go test -v ./test
 
-      - name: Build for Ubuntu
-        run: GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X main.version=$(git describe --tags --always)" -gcflags="all=-trimpath=${PWD}" -o kustomizegen
+      - name: Build for ${{ matrix.goarch }}
+        run: GOARCH=${{ matrix.goarch }} go build -ldflags="-s -w -X main.version=$(git describe --tags --always)" -gcflags="all=-trimpath=${PWD}" -o kustomizegen_${{ matrix.goarch }}
 
       - name: Compress binary
         if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
-        run: tar czf kustomizegen_linux_amd64.tar.gz kustomizegen
+        run: tar czf kustomizegen_${{ matrix.goarch }}.tar.gz kustomizegen_${{ matrix.goarch }}
 
       - name: Create release
         if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
@@ -51,7 +55,7 @@ jobs:
         run: |
           RELEASE_TAG=$(echo "${GITHUB_REF#refs/tags/}")
           RELEASE_ID="${{ steps.create_release.outputs.release_id }}"
-          curl --request POST --url "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=kustomizegen_${RELEASE_TAG}_linux_amd64.tar.gz" \
+          curl --request POST --url "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=kustomizegen_${RELEASE_TAG}_${{ matrix.goarch }}.tar.gz" \
             --header "Authorization: Bearer ${AUTH_TOKEN}" \
             --header "Content-Type: application/gzip" \
-            --data-binary "@./kustomizegen_linux_amd64.tar.gz"
+            --data-binary "@./kustomizegen_${{ matrix.goarch }}.tar.gz"
