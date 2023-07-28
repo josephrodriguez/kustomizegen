@@ -1,14 +1,5 @@
 package types
 
-type KustomizationConfig struct {
-	Version    string                   `yaml:"version"`
-	Namespaces []KustomizationNamespace `yaml:"namespaces"`
-}
-
-type KustomizationNamespace struct {
-	Name string `yaml:"name"`
-}
-
 type Kustomization struct {
 	APIVersion            string                 `yaml:"apiVersion"`
 	Kind                  string                 `yaml:"kind"`
@@ -130,6 +121,7 @@ type LabelSelector struct {
 
 type HelmChart struct {
 	Name        string            `yaml:"name,omitempty"`
+	ReleaseName string            `yaml:"releaseName,omitempty"`
 	Version     string            `yaml:"version,omitempty"`
 	Chart       string            `yaml:"chart,omitempty"`
 	Repository  string            `yaml:"repository,omitempty"`
@@ -144,11 +136,52 @@ type FileSource struct {
 	Source string `yaml:"source,omitempty"`
 }
 
-func NewKustomization(resources []string) *Kustomization {
-	return &Kustomization{
+type NamespaceTransformer struct {
+	APIVersion             string      `yaml:"apiVersion"`
+	Kind                   string      `yaml:"kind"`
+	Metadata               Metadata    `yaml:"metadata"`
+	SetRoleBindingSubjects string      `yaml:"setRoleBindingSubjects,omitempty"`
+	UnsetOnly              bool        `yaml:"unsetOnly,omitempty"`
+	FieldSpecs             []FieldSpec `yaml:"fieldSpecs,omitempty"`
+}
+
+type FieldSpec struct {
+	Path   string `yaml:"path,omitempty"`
+	Kind   string `yaml:"kind,omitempty"`
+	Create bool   `yaml:"create,omitempty"`
+}
+
+func PrototypeKustomization() *Kustomization {
+	kustomization := &Kustomization{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
 		Kind:       "Kustomization",
-		Resources:  resources,
-		// Initialize other fields here as needed
 	}
+
+	return kustomization
+}
+
+func NewNamespaceTransformer(namespace string, unsetOnly ...bool) NamespaceTransformer {
+	ns := NamespaceTransformer{
+		APIVersion: "builtin",
+		Kind:       "NamespaceTransformer",
+		Metadata: Metadata{
+			Name:      "namespace-transformer",
+			Namespace: namespace,
+		},
+		FieldSpecs: []FieldSpec{
+			{
+				Path:   "metadata/name",
+				Kind:   "Namespace",
+				Create: true,
+			},
+		},
+	}
+
+	if len(unsetOnly) > 0 {
+		ns.UnsetOnly = unsetOnly[0]
+	} else {
+		ns.UnsetOnly = false
+	}
+
+	return ns
 }
