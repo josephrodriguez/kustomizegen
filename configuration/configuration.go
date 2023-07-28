@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func ReadConfigFromFile(filePath string) (*types.KustomizationConfig, error) {
+func ReadConfigFromFile(filePath string) (*types.KustomizegenConfiguration, error) {
 	// Open the YAML file
 	file, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -15,7 +15,7 @@ func ReadConfigFromFile(filePath string) (*types.KustomizationConfig, error) {
 	}
 
 	// Initialize a new instance of the struct
-	var config types.KustomizationConfig
+	var config types.KustomizegenConfiguration
 
 	// Unmarshal the YAML content into the struct
 	if err := yaml.Unmarshal(file, &config); err != nil {
