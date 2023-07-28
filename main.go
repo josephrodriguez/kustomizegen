@@ -19,14 +19,13 @@ func main() {
 	configureCmd.MarkFlagRequired("root")
 
 	var generateBuildCmd = &cobra.Command{
-		Use:   "generate-build-command",
+		Use:   "print-build-command",
 		Short: "Generate the shell script with build commands for configured overlays",
 		Run:   cmd.GenerateBuildCommand,
 	}
 	generateBuildCmd.Flags().StringP("root", "r", "", "Path to the Kustomization base folder")
-	generateBuildCmd.Flags().StringP("output", "o", "", "Path to the output shell file")
 	generateBuildCmd.MarkFlagRequired("root")
-	generateBuildCmd.MarkFlagRequired("output")
+	generateBuildCmd.Flags().Bool("enable-helm", false, "Enable Helm")
 
 	var destroyCmd = &cobra.Command{
 		Use:   "destroy-overlays",

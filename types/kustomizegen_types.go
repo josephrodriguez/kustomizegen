@@ -16,3 +16,8 @@ type KustomizegenOverlay struct {
 type KustomizegenContext struct {
 	Namespace string
 }
+
+type KustomizegenBuildCommandContext struct {
+	Path       string
+	EnableHelm bool
+}

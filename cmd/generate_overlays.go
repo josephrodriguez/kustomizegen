@@ -54,7 +54,6 @@ func GenerateOverlaysCommand(cmd *cobra.Command, args []string) {
 
 		//Namespace Transformer
 		nsTransformer := types.NewNamespaceTransformer(overlay.Name, false)
-
 		serializedTransformer, err := serialization.MarshalToYAML(nsTransformer)
 		if err != nil {
 			log.Fatal("Error: ", err)
