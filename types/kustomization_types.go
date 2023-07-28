@@ -121,6 +121,7 @@ type LabelSelector struct {
 
 type HelmChart struct {
 	Name        string            `yaml:"name,omitempty"`
+	ReleaseName string            `yaml:"releaseName,omitempty"`
 	Version     string            `yaml:"version,omitempty"`
 	Chart       string            `yaml:"chart,omitempty"`
 	Repository  string            `yaml:"repository,omitempty"`

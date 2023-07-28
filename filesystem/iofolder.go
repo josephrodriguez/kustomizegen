@@ -50,17 +50,3 @@ func DeleteDir(path string) error {
 
 	return os.RemoveAll(path)
 }
-
-// WriteFile writes data to a file with the given path and permissions.
-// If the permissions argument is set to 0, it will use the default file permissions 0644.
-func WriteFile(filePath string, data []byte, permissions os.FileMode) error {
-	if permissions == 0 {
-		permissions = 0644
-	}
-
-	err := ioutil.WriteFile(filePath, data, permissions)
-	if err != nil {
-		return err
-	}
-	return nil
-}
