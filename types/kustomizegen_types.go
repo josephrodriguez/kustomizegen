@@ -1,26 +1,16 @@
 package types
 
 type KustomizegenConfiguration struct {
-	Version    string                 `yaml:"version"`
-	NameSuffix KustomizegenNameSuffix `yaml:"nameSuffix"`
-	NamePrefix KustomizegenNamePrefix `yaml:"namePrefix"`
-	Overlays   []KustomizegenOverlay  `yaml:"overlays"`
-}
-
-type KustomizegenNamePrefix struct {
-	Value string                      `yaml:"value"`
-	Rules []ResourceRuleConfiguration `yaml:"rules"`
-}
-
-type KustomizegenNameSuffix struct {
-	Value string                      `yaml:"value"`
-	Rules []ResourceRuleConfiguration `yaml:"rules"`
+	Version    string                `yaml:"version"`
+	NameSuffix string                `yaml:"nameSuffix"`
+	NamePrefix string                `yaml:"namePrefix"`
+	Overlays   []KustomizegenOverlay `yaml:"overlays"`
 }
 
 type KustomizegenOverlay struct {
-	Name       string                 `yaml:"name"`
-	NamePrefix KustomizegenNamePrefix `yaml:"namePrefix"`
-	NameSuffix KustomizegenNameSuffix `yaml:"nameSuffix"`
+	Name       string `yaml:"name"`
+	NamePrefix string `yaml:"namePrefix"`
+	NameSuffix string `yaml:"nameSuffix"`
 }
 
 type KustomizegenContext struct {

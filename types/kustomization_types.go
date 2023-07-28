@@ -150,17 +150,6 @@ type FieldSpec struct {
 	Create bool   `yaml:"create,omitempty"`
 }
 
-type KustomizationFileConfiguration struct {
-	NamePrefix []ResourceRuleConfiguration `yaml:"namePrefix"`
-	NameSuffix []ResourceRuleConfiguration `yaml:"nameSuffix"`
-}
-
-type ResourceRuleConfiguration struct {
-	Path       string `yaml:"path"`
-	APIVersion string `yaml:"apiVersion"`
-	Kind       string `yaml:"kind"`
-}
-
 func PrototypeKustomization() *Kustomization {
 	kustomization := &Kustomization{
 		APIVersion: "kustomize.config.k8s.io/v1beta1",
