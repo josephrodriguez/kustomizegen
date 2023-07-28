@@ -14,30 +14,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func ConfigureCommand(cmd *cobra.Command, args []string) {
+func GenerateOverlaysCommand(cmd *cobra.Command, args []string) {
 	root, _ := cmd.Flags().GetString("root")
 
-	// Get the absolute path from the relative path
-	rootAbsolutePath, err := filepath.Abs(root)
+	absoluteRootPath, err := filepath.Abs(root)
 	if err != nil {
 		log.Fatal("Error getting absolute path: %w", err)
 	}
 
-	// Call the private getConfig function
-	kustomizegenConfigFilePath := filepath.Join(rootAbsolutePath, "kustomizegen.yaml")
-	config, err := getConfig(kustomizegenConfigFilePath)
+	config, err := configuration.ReadConfigurationFile(absoluteRootPath)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		log.Fatal("Error reading configuration: %w", err)
 	}
 
 	for _, overlay := range config.Overlays {
-		overlayPath, err := getOverlayPath(rootAbsolutePath, &overlay)
+		overlayPath, err := getOverlayPath(absoluteRootPath, &overlay)
 		if err != nil {
 			log.Fatal("Error:", err)
 		}
 
-		resourcesPath, err := filepath.Rel(overlayPath, rootAbsolutePath)
+		resourcesPath, err := filepath.Rel(overlayPath, absoluteRootPath)
 		if err != nil {
 			fmt.Println("Error calculating relative path:", err)
 			return
@@ -91,7 +87,7 @@ func ConfigureCommand(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		fmt.Printf("Kustomization created for overlay: %s\n", overlay.Name)
+		fmt.Printf("Created Kustomization overlay: %s\n", overlay.Name)
 	}
 }
 
@@ -102,7 +98,7 @@ func getConfig(configFilePath string) (*types.KustomizegenConfiguration, error) 
 	}
 
 	// Read configuration from the file
-	config, err := configuration.ReadConfigFromFile(configFilePath)
+	config, err := configuration.ReadConfigurationFile(configFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading configuration: %w", err)
 	}

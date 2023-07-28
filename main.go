@@ -11,9 +11,9 @@ func main() {
 	var rootCmd = &cobra.Command{Use: "kustomizegen"}
 
 	var configureCmd = &cobra.Command{
-		Use:   "configure",
+		Use:   "generate-overlays",
 		Short: "Create the Kustomization overlays",
-		Run:   cmd.ConfigureCommand,
+		Run:   cmd.GenerateOverlaysCommand,
 	}
 	configureCmd.Flags().StringP("root", "r", "", "Path to the Kustomization base folder")
 	configureCmd.MarkFlagRequired("root")
@@ -29,7 +29,7 @@ func main() {
 	generateBuildCmd.MarkFlagRequired("output")
 
 	var destroyCmd = &cobra.Command{
-		Use:   "destroy",
+		Use:   "destroy-overlays",
 		Short: "Destroy the generated Kustomization overlays",
 		Run:   cmd.DestroyCommand,
 	}

@@ -43,15 +43,12 @@ func CreateTempDir() (string, error) {
 	return tempDir, nil
 }
 
-// RemoveTempDir removes the temporary directory and its contents.
-// If the directory does not exist, it returns nil.
-func RemoveTempDir(tempDir string) error {
-	if _, err := os.Stat(tempDir); os.IsNotExist(err) {
-		// Directory does not exist, return nil.
+func DeleteDir(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil
 	}
 
-	return os.RemoveAll(tempDir)
+	return os.RemoveAll(path)
 }
 
 // WriteFile writes data to a file with the given path and permissions.
