@@ -31,7 +31,7 @@ func main() {
 	var destroyCmd = &cobra.Command{
 		Use:   "destroy-overlays",
 		Short: "Destroy the generated Kustomization overlays",
-		Run:   cmd.DestroyCommand,
+		Run:   cmd.DestroyOverlaysCommand,
 	}
 	destroyCmd.Flags().StringP("root", "r", "", "Path to the Kustomization base folder")
 	destroyCmd.MarkFlagRequired("root")

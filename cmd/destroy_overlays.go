@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func DestroyCommand(cmd *cobra.Command, args []string) {
+func DestroyOverlaysCommand(cmd *cobra.Command, args []string) {
 	rootPath, _ := cmd.Flags().GetString("root")
 
 	absoluteRootPath, err := filepath.Abs(rootPath)
