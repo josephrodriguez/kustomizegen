@@ -13,41 +13,22 @@ go install github.com/josephrodriguez/kustomizegen@latest
 
 ### Method 2: Download Binary Release
 
-#### Linux:
-
-1. Download the binary for your Linux architecture using `curl` and extract the downloaded archive:
+- Download the binary for your Linux architecture using `curl` and extract the downloaded archive:
 
    ```bash
    curl -LO https://github.com/josephrodriguez/kustomizegen/releases/latest/download/kustomizegen_amd64.tar.gz
    tar -xzvf kustomizegen_amd64.tar.gz
    ```
 
-2. Move the binary to a location included in your system's PATH:
+- Move the binary to a location included in your system's PATH:
 
    ```bash
    sudo mv kustomizegen /usr/local/bin/
    ```
 
-3. Now, you can use `kustomizegen` from the terminal.
+- Now, you can use `kustomizegen` from the terminal.
 
 Please ensure that the destination folder (`/usr/local/bin/`) is included in your system's PATH environment variable. This will allow you to execute `kustomizegen` from any location on your Linux system.
-
-#### Windows:
-
-1. Download the binary for Windows using `curl` and extract the downloaded archive:
-
-   ```powershell
-   curl -LO https://github.com/josephrodriguez/kustomizegen/releases/latest/download/kustomizegen_amd64.zip
-   Expand-Archive -Path kustomizegen_amd64.zip -DestinationPath .
-   ```
-
-2. Move the binary to a location included in your system's PATH:
-
-   ```powershell
-   Move-Item -Path .\kustomizegen.exe -Destination C:\Windows\System32
-   ```
-
-3. Now, you can use `kustomizegen` from the command prompt.
 
 ## Usage
 
