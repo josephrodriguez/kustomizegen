@@ -11,7 +11,8 @@ jobs:
   build:
     strategy:
       matrix:
-        goarch: [amd64, arm64]
+        go_os: [linux, windows, darwin]
+        go_arch: [amd64, arm64]
       max-parallel: 1
       fail-fast: true
   
@@ -32,12 +33,18 @@ jobs:
       - name: Run unit tests
         run: go test -v ./test
 
-      - name: Build for ${{ matrix.goarch }}
-        run: GOARCH=${{ matrix.goarch }} go build -ldflags="-s -w -X main.version=$(git describe --tags --always)" -gcflags="all=-trimpath=${PWD}" -o kustomizegen
+      - name: Build for ${{ matrix.go_os }} - ${{ matrix.go_arch }}
+        run: GOOS=${{ matrix.go_os }} GOARCH=${{ matrix.go_arch }} go build -ldflags="-s -w -X main.version=$(git describe --tags --always)" -gcflags="all=-trimpath=${PWD}" -o kustomizegen
 
       - name: Compress binary
         if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
-        run: tar czf kustomizegen_${{ matrix.goarch }}.tar.gz kustomizegen
+        run: tar czf kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz kustomizegen
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}
+          path: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}
 
       - name: Create release
         if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
@@ -61,7 +68,7 @@ jobs:
       - name: Upload binary as asset
         if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
         run: |
-          curl --request POST --url "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${{env.RELEASE_ID}}/assets?name=kustomizegen_${{ matrix.goarch }}.tar.gz" \
+          curl --request POST --url "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${{env.RELEASE_ID}}/assets?name=${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz" \
             --header "Authorization: Bearer ${AUTH_TOKEN}" \
             --header "Content-Type: application/gzip" \
-            --data-binary "@./kustomizegen_${{ matrix.goarch }}.tar.gz"
+            --data-binary "@./kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz"
