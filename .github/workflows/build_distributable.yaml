@@ -33,18 +33,17 @@ jobs:
       - name: Run unit tests
         run: go test -v ./test
 
-      - name: Build for ${{ matrix.go_os }} - ${{ matrix.go_arch }}
+      - name: Build Go binary ${{ matrix.go_os }} - ${{ matrix.go_arch }}
         run: GOOS=${{ matrix.go_os }} GOARCH=${{ matrix.go_arch }} go build -ldflags="-s -w -X main.version=$(git describe --tags --always)" -gcflags="all=-trimpath=${PWD}" -o kustomizegen
 
       - name: Compress binary
-        if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
         run: tar czf kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz kustomizegen
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}
-          path: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}
+          name: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz
+          path: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz
 
       - name: Create release
         if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
