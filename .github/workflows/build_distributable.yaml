@@ -40,7 +40,7 @@ jobs:
         run: tar czf kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz kustomizegen
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz
           path: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz
