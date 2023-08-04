@@ -13,13 +13,8 @@ jobs:
       matrix:
         go_os: [linux, windows, darwin]
         go_arch: [amd64, arm64]
-      max-parallel: 1
-      fail-fast: true
   
     runs-on: ubuntu-latest
-
-    env:
-      AUTH_TOKEN: ${{ secrets.FINE_GRAINED_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -46,28 +41,8 @@ jobs:
           path: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz
 
       - name: Create release
-        if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
-        id: create_release
-        run: |
-          RELEASE_TAG=$(echo "${GITHUB_REF#refs/tags/}")
-          RELEASE_INFO=$(curl -s --request GET --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --header "Authorization: Bearer ${AUTH_TOKEN}")
-          RELEASE_ID=$(echo "$RELEASE_INFO" | jq -r '.id')
-
-          if [ "$RELEASE_ID" = "null" ]; then
-            BODY="{\"tag_name\":\"${RELEASE_TAG}\",\"name\":\"Release ${RELEASE_TAG}\",\"body\":\"Release ${RELEASE_TAG}\",\"draft\":false,\"prerelease\":false}"
-            RELEASE_INFO=$(curl -s --request POST --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" \
-              --header "Authorization: Bearer ${AUTH_TOKEN}" \
-              --header "Content-Type: application/json" \
-              --data "$BODY")
-            RELEASE_ID=$(echo "${RELEASE_INFO}" | jq -r '.id')
-          fi
-
-          echo "RELEASE_ID=$RELEASE_ID" >> $GITHUB_ENV
-
-      - name: Upload binary as asset
-        if: ${{ github.event.base_ref == 'refs/heads/main' && github.ref_type == 'tag' }}
-        run: |
-          curl --request POST --url "https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${{env.RELEASE_ID}}/assets?name=kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz" \
-            --header "Authorization: Bearer ${AUTH_TOKEN}" \
-            --header "Content-Type: application/gzip" \
-            --data-binary "@./kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz"
+        uses: josephrodriguez/swift-release@v1
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        with:
+          token: ${{ secrets.FINE_GRAINED_TOKEN }}
+          asset_path: kustomizegen_${{ matrix.go_os }}_${{ matrix.go_arch }}.tar.gz
