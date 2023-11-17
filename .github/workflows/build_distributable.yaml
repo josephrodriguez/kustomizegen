@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    env: 
+      IS_PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+    strategy:
+      matrix:
+        go_os: [linux, windows, darwin]
+        go_arch: [amd64, arm64]
+  
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+
+      - name: Run unit tests
+        run: go test -v ./test
+
+      - name: Build Go binary ${{ matrix.go_os }} - ${{ matrix.go_arch }}
+        run: GOOS=${{ matrix.go_os }} GOARCH=${{ matrix.go_arch }} go build -ldflags="-s -w -X main.version=$(git describe --tags --always)" -gcflags="all=-trimpath=${PWD}" -o kustomizegen
+
+      - name: Compress binary
+        run: tar czf kustomizegen-${{ github.ref_name }}-${{ matrix.go_os }}-${{ matrix.go_arch }}.tar.gz kustomizegen
+
+      - name: Release
+        uses: josephrodriguez/swift-release@v1.1
+        with:
+          token: ${{ secrets.AUTH_TOKEN }}
+          asset_path: kustomizegen-${{ github.ref_name }}-${{ matrix.go_os }}-${{ matrix.go_arch }}.tar.gz
+          prerelease: ${{ env.IS_PRE_RELEASE }}
